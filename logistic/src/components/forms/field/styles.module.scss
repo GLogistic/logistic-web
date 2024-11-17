@@ -1,0 +1,35 @@
+.inputContainer  {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    min-width: 10vw;
+
+    .input {
+        background: #fff;
+        border-radius: 5px;
+        padding: 5px;
+        font-size: 16px;
+
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+
+        @media screen and (max-width: 768px) {
+            font-size: 14px;
+        }
+    }
+
+    .inputLabel {
+        font-size: 18px;
+        color: #292727;
+
+        @media screen and (max-width: 768px) {
+            font-size: 16px;
+        }
+    }
+
+    .error {
+        color: #dd3a3a;
+        font-size: 14px;
+        min-height: 25px;
+    }
+}

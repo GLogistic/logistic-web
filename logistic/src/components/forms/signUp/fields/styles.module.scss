@@ -1,0 +1,13 @@
+.fieldsMainContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 15px;
+
+    .fieldsContentContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+}
