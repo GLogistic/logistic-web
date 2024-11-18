@@ -8,6 +8,8 @@ export const UserNav = () => {
         await SubmitLogout();
         location.reload();
     };
+
+    const defaultPaginationParams ='page=1&pageSize=10';
     return (
     <>
         <div className={styles.contentContainer}>
@@ -22,21 +24,21 @@ export const UserNav = () => {
                 <ul className={styles.pagesNavList}>
                     <li className={styles.pagesNavItem}>
                         <Link 
-                        href='/cargo' 
+                        href={`/cargos?${defaultPaginationParams}`} 
                         className={styles.navLink}>
                             Cargo
                         </Link>
                     </li>
                     <li className={styles.pagesNavItem}>
                         <Link 
-                        href='/route'
+                        href={`/routes?${defaultPaginationParams}`} 
                         className={styles.navLink}>
                             Route
                         </Link>
                     </li>
                     <li className={styles.pagesNavItem}>
                         <Link 
-                        href='/settlement'
+                        href={`/settlements?${defaultPaginationParams}`} 
                         className={styles.navLink}>
                             Settlement
                         </Link>

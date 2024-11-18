@@ -43,8 +43,9 @@ export const SignInFields = () => {
             <SubmitButton
             disabled={!formState.isValid}
             className={styles.submitButton}
-            text='Sign in'
-            />
+            >
+                Sign in
+            </SubmitButton>
         </div>
     );
 }

@@ -8,15 +8,13 @@ export interface ISubmitButton extends
     disabled?: boolean;
 }
 
-export const SubmitButton = (props: ISubmitButton) => {
-    const transformProps = {...props, className: clsx(styles.submitButton, props.className)};
+export const PrimaryButton = (props: ISubmitButton ) => {
+    const transformProps = {...props, className: clsx(styles.primaryButton, props.className)};
 
     return (
         <button 
-        type="submit"
-        {...transformProps}
-        >
+        {...transformProps}>
             {props.children}
         </button>
     );
-};
+} 

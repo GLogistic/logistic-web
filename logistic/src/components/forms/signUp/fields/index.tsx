@@ -67,8 +67,9 @@ export const SignUpFields = () => {
             <SubmitButton
             disabled={!formState.isValid}
             className={styles.submitButton}
-            text='Sign Up'
-            />
+            >
+                Sign Up
+            </SubmitButton>
         </div>
     );
 }
