@@ -16,8 +16,10 @@
 
     &:disabled {
         cursor: not-allowed;
-
-        
         background: #6382ad6c;
+
+        &:active {
+            box-shadow: none;
+        }
     }
 }

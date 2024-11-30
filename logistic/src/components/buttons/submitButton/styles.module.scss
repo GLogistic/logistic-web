@@ -13,6 +13,11 @@
     }
 
     &:disabled {
-        cursor: default;
+        background: #7777776c;
+        cursor: not-allowed;
+
+        &:active {
+            box-shadow: none;
+        }
     }
 }

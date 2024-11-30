@@ -45,8 +45,10 @@ export const SignUpForm = ({
         resolver: yupResolver(schema),
     });
 
+    const signUpMutation = useSubmitSignUp();
+
     const onSubmit: SubmitHandler<ISignUpData> = async (data) => {
-        const result = await useSubmitSignUp(data);
+        const result = await signUpMutation.mutateAsync(data);
 
         if (
             !result || 

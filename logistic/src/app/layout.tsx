@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/header";
-import { QueryClient } from "@tanstack/react-query";
 import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {

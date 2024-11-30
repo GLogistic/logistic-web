@@ -30,20 +30,39 @@ export const SignInForm = ({
         resolver: yupResolver(schema),
     });
 
-    const onSubmit: SubmitHandler<ISignInData> = async (data) => {
-        const result = useSubmitSignIn(data);
+    const setRootError = (error: string) => 
+        form.setError('root', { message: error });
+    
+    const signInMutation = useSubmitSignIn();
 
-        if (
-            !result || 
-            (result.data &&
-                result.data.status >= 400 && 
-                result.data.status <= 599))
+    const onSubmit: SubmitHandler<ISignInData> = async (data) => {
+        const result = await signInMutation.mutateAsync(data);
+
+        if (!result) {
+            setRootError('Something went wrong');
             return;
+        }
+
+        if (result.status >= 400 && result.status <= 499) {
+            setRootError('Ivalid credentials');
+            return;
+        }
+
+        if (result.status >= 500 && result.status <= 599) {
+            setRootError('Server error');
+            return;
+        }
+
+        if (!result.data) {
+            setRootError('Something went wrong');
+            return;
+        }
 
         if (typeof window !== 'undefined')
             localStorage.setItem('user', JSON.stringify(result.data));
 
-        if (onSucces != undefined) onSucces();
+        if (onSucces != undefined) 
+            onSucces();
     };
 
     return (

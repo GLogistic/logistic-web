@@ -1,13 +1,16 @@
 import { useSubmitLogout } from '@/api/submit-logout.api';
 import styles from  '@/components/header/styles.module.scss';
-import { Route } from '@/enums/route.enum';
+import { ApiRoute } from '@/enums/api-route.enum';
 import Link from 'next/link';
 
 export const UserNav = () => {
+    const logoutMutation = useSubmitLogout();
     const logout = async () => {
-        localStorage.removeItem('user');
-        await useSubmitLogout();
-        location.reload();
+        const result = await logoutMutation.mutateAsync();
+        if (result.status < 400) {
+            localStorage.removeItem('user');
+            location.reload();
+        }
     };
 
     const defaultPaginationParams ='page=1&pageSize=10';
@@ -25,21 +28,21 @@ export const UserNav = () => {
                 <ul className={styles.pagesNavList}>
                     <li className={styles.pagesNavItem}>
                         <Link 
-                        href={`/${Route.Cargo}?${defaultPaginationParams}`} 
+                        href={`/${ApiRoute.Cargo}?${defaultPaginationParams}`} 
                         className={styles.navLink}>
                             Cargo
                         </Link>
                     </li>
                     <li className={styles.pagesNavItem}>
                         <Link 
-                        href={`/${Route.Route}?${defaultPaginationParams}`} 
+                        href={`/${ApiRoute.Route}?${defaultPaginationParams}`} 
                         className={styles.navLink}>
                             Route
                         </Link>
                     </li>
                     <li className={styles.pagesNavItem}>
                         <Link 
-                        href={`/${Route.Settlement}?${defaultPaginationParams}`} 
+                        href={`/${ApiRoute.Settlement}?${defaultPaginationParams}`} 
                         className={styles.navLink}>
                             Settlement
                         </Link>

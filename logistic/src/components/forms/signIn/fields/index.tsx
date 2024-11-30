@@ -46,6 +46,11 @@ export const SignInFields = () => {
             >
                 Sign in
             </SubmitButton>
+            <div className={styles.errorContainer}>
+                <p className={styles.error}>
+                    {formState.errors.root?.message}
+                </p>
+            </div>
         </div>
     );
 }
