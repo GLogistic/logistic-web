@@ -3,7 +3,7 @@ import { SignUpFields } from "./fields";
 import * as yup from 'yup';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ISignUpData } from "@/interfaces/signUp-data.interface";
-import { SubmitSignUp } from "@/api/submit-signUp.api";
+import { useSubmitSignUp } from "@/api/submit-signUp.api";
 
 const schema: yup.ObjectSchema<ISignUpData> = yup
     .object()
@@ -46,7 +46,7 @@ export const SignUpForm = ({
     });
 
     const onSubmit: SubmitHandler<ISignUpData> = async (data) => {
-        const result = await SubmitSignUp(data);
+        const result = await useSubmitSignUp(data);
 
         if (
             !result || 

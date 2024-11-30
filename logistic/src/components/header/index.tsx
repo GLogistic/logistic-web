@@ -1,14 +1,13 @@
 'use client'
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import styles from './styles.module.scss';
 import { UnauthorizedNav } from './components/unauthorizeNav';
 import { UserNav } from './components/userNav';
-import { IUser } from '@/interfaces/user.interface';
 import { UserRoles } from '@/enums/user-role.enum';
 import { AdminNav } from './components/adminNav';
+import { IUser } from '@/interfaces/entity/user.interface';
 
 export const Header = () => {
     const [user, setUser] = useState<IUser | null>(null);

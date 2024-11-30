@@ -1,8 +1,10 @@
 .primaryButton {
     background: #626fdb81;
-    border-radius: 5px;
-    padding: 5px 8px;
+    border-radius: 10px;
+    padding: 5px 10px;
     cursor: pointer;
+
+    transition: 0.5s;
 
     &:hover {
         background: #639cec6c;
@@ -13,6 +15,9 @@
     }
 
     &:disabled {
-        cursor: default;
+        cursor: not-allowed;
+
+        
+        background: #6382ad6c;
     }
 }

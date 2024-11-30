@@ -12,11 +12,11 @@ import Link from 'next/link';
 import { PrimaryInput } from '../inputs/primaryInput';
 import { IPaginationParams } from '@/interfaces/pagination-params.interface';
 import { HeaderParams } from '@/enums/header-params.enum';
+import { useGetUsers } from '@/api/get-users.api';
+import { IUser } from '@/interfaces/entity/user.interface';
 
-export const Settlements = () => {
-    const [settlements, setSettlements] = useState<ISettlement[]>([]);
-
-    const [titleFilter, setTitleFilter] = useState<string>('');
+export const Users = () => {
+    const [users, setUsers] = useState<IUser[]>([]);
 
     const searchParams = useSearchParams();
     
@@ -34,14 +34,14 @@ export const Settlements = () => {
         Number(searchParams.get('pageSize'))
     );
     
-    const { data } = useGetSettlements({page, pageSize, titleFilter});
+    const { data } = useGetUsers({page, pageSize});
 
     useEffect(() => {
         if (!data || !data!.headers)
             return;
 
         if (data.status == 204) {
-            setSettlements([]);
+            setUsers([]);
             return;
         }
 
@@ -53,7 +53,7 @@ export const Settlements = () => {
         setTotalSize(paginationParams.totalSize);
         setTotalPages(paginationParams.totalPages);
 
-        setSettlements(data.data ?? [])
+        setUsers(data.data ?? [])
     }, [data]); 
 
     return (
@@ -75,23 +75,11 @@ export const Settlements = () => {
             <table className={styles.entityTable}>
                 <thead>
                     <tr>
-                        <th
-                        style={{ padding: '0px' }}
-                        >
-                            <div className={clsx(styles.cell, styles.headerCellWithFilter)}>
-                                <p>
-                                    Title
-                                </p>
-                                <div className={styles.titleFilter}>
-                                    <PrimaryInput
-                                    inputContainerClassName={styles.titleInputContainer}
-                                    placeholder='Enter title...'
-                                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                        setTitleFilter(e.target.value ?? '');
-                                    }}
-                                    />
-                                </div>
-                            </div>
+                        <th className={clsx(styles.cell, styles.headerCell)}>
+                            Name
+                        </th>
+                        <th className={clsx(styles.cell, styles.headerCell)}>
+                            Email
                         </th>
                         <th className={clsx(styles.cell, styles.headerCell)}>
                             Actions
@@ -99,9 +87,10 @@ export const Settlements = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {settlements && settlements.map((settlement, idx) => (
-                        <tr key={`settlement-${idx}`}>
-                            <td className={styles.cell}>{settlement.title}</td>
+                    {users && users.map((user, idx) => (
+                        <tr key={`user-${idx}`}>
+                            <td className={styles.cell}>{`${user.firstName} ${user.lastName}`}</td>
+                            <td className={styles.cell}>{user.email}</td>
                             <td className={clsx(styles.cell, styles.actionButtonsCell)}>
                                 <PrimaryButton>
                                     Delete

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/header";
+import { QueryClient } from "@tanstack/react-query";
+import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
   title: "Glogistic",
@@ -13,6 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <Providers>
     <html lang="en">
       <body>
         <header>
@@ -21,5 +24,6 @@ export default function RootLayout({
         {children}
       </body>
     </html>
+    </Providers>
   );
 }

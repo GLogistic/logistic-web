@@ -1,14 +1,10 @@
-import { IApiResponseInterface } from "@/interfaces/api-response.interface";
 import { LogisticHostApi } from "./base/logisticHost.api";
+import { useMutation } from "@tanstack/react-query";
 
-export const SubmitLogout = async (): Promise<IApiResponseInterface | null> => {
-    let result: IApiResponseInterface | null = null;
-
-    await LogisticHostApi.post(
-        '/logout',
-    ).then(res => result = res).catch((e) => {
-        console.log(e);
+export const useSubmitLogout = () => 
+    useMutation({
+        mutationKey: [],
+        mutationFn: async () => await LogisticHostApi.post(
+            '/logout',
+        ),
     });
-
-    return result;
-};

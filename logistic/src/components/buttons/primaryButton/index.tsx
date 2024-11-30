@@ -13,6 +13,7 @@ export const PrimaryButton = (props: ISubmitButton ) => {
 
     return (
         <button 
+        disabled={props.disabled}
         {...transformProps}>
             {props.children}
         </button>

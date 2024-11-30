@@ -1,6 +1,6 @@
 'use client'
 
-import { SubmitSignIn } from "@/api/submit-signIn.api";
+import { useSubmitSignIn } from "@/api/submit-signIn.api";
 import { ISignInData } from "@/interfaces/signIn.interface";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { SignInFields } from "./fields";
@@ -31,12 +31,13 @@ export const SignInForm = ({
     });
 
     const onSubmit: SubmitHandler<ISignInData> = async (data) => {
-        const result = await SubmitSignIn(data);
+        const result = useSubmitSignIn(data);
 
         if (
             !result || 
-            (result.status >= 400 && 
-            result.status <= 599))
+            (result.data &&
+                result.data.status >= 400 && 
+                result.data.status <= 599))
             return;
 
         if (typeof window !== 'undefined')

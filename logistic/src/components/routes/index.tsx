@@ -1,7 +1,5 @@
 'use client'
 
-import { useGetSettlements } from '@/api/get-settlements.api';
-import { ISettlement } from '@/interfaces/entity/settlement.interface';
 import { useState, useEffect, ChangeEvent } from 'react';
 import { usePagination } from '../helpers/use-pagination.helper';
 import { useSearchParams } from 'next/navigation';
@@ -12,11 +10,13 @@ import Link from 'next/link';
 import { PrimaryInput } from '../inputs/primaryInput';
 import { IPaginationParams } from '@/interfaces/pagination-params.interface';
 import { HeaderParams } from '@/enums/header-params.enum';
+import { IRoute } from '@/interfaces/entity/route.interface';
+import { useGetRoutes } from '@/api/get-routes.api';
 
-export const Settlements = () => {
-    const [settlements, setSettlements] = useState<ISettlement[]>([]);
+export const Routes = () => {
+    const [routes, setRoutes] = useState<IRoute[]>([]);
 
-    const [titleFilter, setTitleFilter] = useState<string>('');
+    const [startSettlementTitleFilter, setStartSettlementTitleFilter] = useState<string>('');
 
     const searchParams = useSearchParams();
     
@@ -34,14 +34,14 @@ export const Settlements = () => {
         Number(searchParams.get('pageSize'))
     );
     
-    const { data } = useGetSettlements({page, pageSize, titleFilter});
+    const { data } = useGetRoutes({page, pageSize, startSettlementTitleFilter});
 
     useEffect(() => {
         if (!data || !data!.headers)
             return;
 
         if (data.status == 204) {
-            setSettlements([]);
+            setRoutes([]);
             return;
         }
 
@@ -53,7 +53,7 @@ export const Settlements = () => {
         setTotalSize(paginationParams.totalSize);
         setTotalPages(paginationParams.totalPages);
 
-        setSettlements(data.data ?? [])
+        setRoutes(data.data ?? [])
     }, [data]); 
 
     return (
@@ -80,18 +80,24 @@ export const Settlements = () => {
                         >
                             <div className={clsx(styles.cell, styles.headerCellWithFilter)}>
                                 <p>
-                                    Title
+                                    Start settlement
                                 </p>
                                 <div className={styles.titleFilter}>
                                     <PrimaryInput
                                     inputContainerClassName={styles.titleInputContainer}
                                     placeholder='Enter title...'
                                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                        setTitleFilter(e.target.value ?? '');
+                                        setStartSettlementTitleFilter(e.target.value ?? '');
                                     }}
                                     />
                                 </div>
                             </div>
+                        </th>
+                        <th className={clsx(styles.cell, styles.headerCell)}>
+                            End settlement
+                        </th>
+                        <th className={clsx(styles.cell, styles.headerCell)}>
+                            Distance
                         </th>
                         <th className={clsx(styles.cell, styles.headerCell)}>
                             Actions
@@ -99,9 +105,12 @@ export const Settlements = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {settlements && settlements.map((settlement, idx) => (
-                        <tr key={`settlement-${idx}`}>
-                            <td className={styles.cell}>{settlement.title}</td>
+                    {routes && routes.map((route, idx) => 
+                    route && route.startSettlement && route.endSettlement && (
+                        <tr key={`route-${idx}`}>
+                            <td className={styles.cell}>{route.startSettlement.title}</td>
+                            <td className={styles.cell}>{route.endSettlement.title}</td>
+                            <td className={styles.cell}>{route.distance}</td>
                             <td className={clsx(styles.cell, styles.actionButtonsCell)}>
                                 <PrimaryButton>
                                     Delete

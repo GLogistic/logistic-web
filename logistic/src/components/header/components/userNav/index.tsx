@@ -1,11 +1,12 @@
-import { SubmitLogout } from '@/api/submit-logout.api';
+import { useSubmitLogout } from '@/api/submit-logout.api';
 import styles from  '@/components/header/styles.module.scss';
+import { Route } from '@/enums/route.enum';
 import Link from 'next/link';
 
 export const UserNav = () => {
     const logout = async () => {
         localStorage.removeItem('user');
-        await SubmitLogout();
+        await useSubmitLogout();
         location.reload();
     };
 
@@ -24,21 +25,21 @@ export const UserNav = () => {
                 <ul className={styles.pagesNavList}>
                     <li className={styles.pagesNavItem}>
                         <Link 
-                        href={`/cargos?${defaultPaginationParams}`} 
+                        href={`/${Route.Cargo}?${defaultPaginationParams}`} 
                         className={styles.navLink}>
                             Cargo
                         </Link>
                     </li>
                     <li className={styles.pagesNavItem}>
                         <Link 
-                        href={`/routes?${defaultPaginationParams}`} 
+                        href={`/${Route.Route}?${defaultPaginationParams}`} 
                         className={styles.navLink}>
                             Route
                         </Link>
                     </li>
                     <li className={styles.pagesNavItem}>
                         <Link 
-                        href={`/settlements?${defaultPaginationParams}`} 
+                        href={`/${Route.Settlement}?${defaultPaginationParams}`} 
                         className={styles.navLink}>
                             Settlement
                         </Link>

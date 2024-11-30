@@ -12,9 +12,11 @@ import Link from 'next/link';
 import { PrimaryInput } from '../inputs/primaryInput';
 import { IPaginationParams } from '@/interfaces/pagination-params.interface';
 import { HeaderParams } from '@/enums/header-params.enum';
+import { ICargo } from '@/interfaces/entity/cargo.interface';
+import { useGetCargos } from '@/api/get-cargos.api';
 
-export const Settlements = () => {
-    const [settlements, setSettlements] = useState<ISettlement[]>([]);
+export const Cargos = () => {
+    const [cargos, setCargos] = useState<ICargo[]>([]);
 
     const [titleFilter, setTitleFilter] = useState<string>('');
 
@@ -34,14 +36,14 @@ export const Settlements = () => {
         Number(searchParams.get('pageSize'))
     );
     
-    const { data } = useGetSettlements({page, pageSize, titleFilter});
+    const { data } = useGetCargos({page, pageSize, titleFilter});
 
     useEffect(() => {
         if (!data || !data!.headers)
             return;
 
         if (data.status == 204) {
-            setSettlements([]);
+            setCargos([]);
             return;
         }
 
@@ -53,7 +55,7 @@ export const Settlements = () => {
         setTotalSize(paginationParams.totalSize);
         setTotalPages(paginationParams.totalPages);
 
-        setSettlements(data.data ?? [])
+        setCargos(data.data ?? [])
     }, [data]); 
 
     return (
@@ -94,14 +96,22 @@ export const Settlements = () => {
                             </div>
                         </th>
                         <th className={clsx(styles.cell, styles.headerCell)}>
+                            Weight
+                        </th>
+                        <th className={clsx(styles.cell, styles.headerCell)}>
+                            Registration number
+                        </th>
+                        <th className={clsx(styles.cell, styles.headerCell)}>
                             Actions
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    {settlements && settlements.map((settlement, idx) => (
-                        <tr key={`settlement-${idx}`}>
-                            <td className={styles.cell}>{settlement.title}</td>
+                    {cargos && cargos.map((cargo, idx) => (
+                        <tr key={`cargo-${idx}`}>
+                            <td className={styles.cell}>{cargo.title}</td>
+                            <td className={styles.cell}>{cargo.weight}</td>
+                            <td className={styles.cell}>{cargo.registrationNumber}</td>
                             <td className={clsx(styles.cell, styles.actionButtonsCell)}>
                                 <PrimaryButton>
                                     Delete

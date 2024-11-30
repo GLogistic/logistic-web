@@ -1,15 +1,15 @@
-import { IApiResponseInterface } from "@/interfaces/api-response.interface";
 import { LogisticHostApi } from "./base/logisticHost.api";
 import { IGetSettlementsRequest } from "@/interfaces/get-settlements-request.interface";
+import { useQuery } from "@tanstack/react-query";
+import { ISettlement } from "@/interfaces/entity/settlement.interface";
+import { Route } from "@/enums/route.enum";
 
-export const GetSettlements = async (data: IGetSettlementsRequest): Promise<IApiResponseInterface | null> => {
-    let result: IApiResponseInterface | null = null;
-
-    await LogisticHostApi.get(
-        `/settlements?page=${data.page}&pageSize=${data.pageSize}${(data.titleFilter && data.titleFilter != '') ? `&titleFilter=${data.titleFilter}` : ''}`,
-    ).then(res => result = res).catch((e) => {
-        console.log(e);
-    });
-
-    return result;
-};
+const queryKey = 'get-settlements-key';
+export const useGetSettlements = (data: IGetSettlementsRequest) =>
+    useQuery({
+        queryKey: [data.titleFilter, data.page, data.pageSize, queryKey],
+        queryFn: async () => await LogisticHostApi.get<ISettlement[]>(
+            `/${Route.Settlement}?page=${data.page}&pageSize=${data.pageSize}${(data.titleFilter && data.titleFilter != '') ? `&titleFilter=${data.titleFilter}` : ''}`,
+        ),
+    })
+    

@@ -1,4 +1,8 @@
 export interface IPaginationParams {
-    page: number;
+    currentPage: number;
     pageSize: number;
+    totalSize: number;
+    totalPages: number;
+    haveNext: boolean;
+    havePrev: boolean;
 }
