@@ -16,4 +16,5 @@ jobs:
         shell: bash 
         run: |
               cd ./logistic
+              npm i --force
               npm run build
