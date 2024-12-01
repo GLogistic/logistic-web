@@ -1,4 +1,4 @@
-export interface IGetUsersRequest {
+export interface IApiGetUsers {
     page: number;
     pageSize: number;
 }

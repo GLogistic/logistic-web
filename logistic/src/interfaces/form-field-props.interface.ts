@@ -5,7 +5,7 @@ export interface IFormFieldProps {
     type: string;
     placeholder: string;
     register: () => UseFormRegisterReturn;
-    onChange?: (event: ChangeEvent<HTMLInputElement>) => void | undefined;
+    onChange: (event: ChangeEvent<HTMLInputElement>) => void | undefined;
     error: FieldError | undefined;
     label?: string | undefined;
     errorClassName?: string | undefined;

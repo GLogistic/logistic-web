@@ -15,6 +15,9 @@ export const DeleteEntityModal = ({
     wrapperStyles = '',
     containerStyles = '',
 }: IDeleteEntityModalParams) => {
+    if (!isOpen)
+        return;
+    
     const { isMobile } = useResizeWindow();
 
     const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -33,9 +36,6 @@ export const DeleteEntityModal = ({
             document.removeEventListener('click', clickOverWrapper as any);
         }
     }, [onClose]);
-
-    if (!isOpen)
-        return;
 
     return (
         <div className={styles.overlay}>

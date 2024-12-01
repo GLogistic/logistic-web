@@ -1,4 +1,4 @@
-import { ISignInData } from "@/interfaces/signIn.interface";
+import { IApiSignInData } from "@/interfaces/api/api-signIn-data.interface";
 import { useFormContext } from "react-hook-form";
 import { FormField } from "../../field";
 
@@ -12,7 +12,7 @@ export const SignInFields = () => {
         formState,
         trigger,
         setValue,
-    } = useFormContext<ISignInData>();
+    } = useFormContext<IApiSignInData>();
 
     const changeField = (field: 'Email' | 'Password') => 
         (e: ChangeEvent<HTMLInputElement>) => {

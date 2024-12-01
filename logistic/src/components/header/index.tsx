@@ -137,8 +137,8 @@ export const Header = () => {
 
             </div>
         </div>
-        {isOpenSignInModal && 
             <ModalWithOverlay
+            isOpen={isOpenSignInModal}
             onClose={() => setIsOpenSignInModal(false)}
             >
                 <SignInForm
@@ -150,9 +150,8 @@ export const Header = () => {
                 }}
                 />
             </ModalWithOverlay>
-        }
-        {isOpenSignUpModal && 
             <ModalWithOverlay
+            isOpen={isOpenSignUpModal}
             onClose={() => setIsOpenSignUpModal(false)}
             >
                 <SignUpForm
@@ -163,7 +162,6 @@ export const Header = () => {
                 }}
                 />
             </ModalWithOverlay>
-        }
         </>
     )  
 };

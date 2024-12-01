@@ -2,10 +2,10 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { SignUpFields } from "./fields";
 import * as yup from 'yup';
 import { yupResolver } from "@hookform/resolvers/yup";
-import { ISignUpData } from "@/interfaces/signUp-data.interface";
+import { IApiSignUpData } from "@/interfaces/api/api-signUp-data.interface";
 import { useSubmitSignUp } from "@/api/auth/submit-signUp.api";
 
-const schema: yup.ObjectSchema<ISignUpData> = yup
+const schema: yup.ObjectSchema<IApiSignUpData> = yup
     .object()
     .shape({
         FirstName: yup
@@ -41,13 +41,13 @@ export interface ISignUpFormProps {
 export const SignUpForm = ({
     onSucces,
 }: ISignUpFormProps) => {
-    const form = useForm<ISignUpData>({
+    const form = useForm<IApiSignUpData>({
         resolver: yupResolver(schema),
     });
 
     const signUpMutation = useSubmitSignUp();
 
-    const onSubmit: SubmitHandler<ISignUpData> = async (data) => {
+    const onSubmit: SubmitHandler<IApiSignUpData> = async (data) => {
         const result = await signUpMutation.mutateAsync(data);
 
         if (

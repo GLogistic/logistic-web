@@ -1,0 +1,92 @@
+.fieldContainer  {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    min-width: 10vw;
+
+    .field {
+        background: #fff;
+        border-radius: 5px;
+        padding: 5px;
+        position: relative;
+
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+
+        .selectedItemTitle {
+            color: #292727;
+            font-size: 16px;
+            text-align: start;
+            cursor: pointer;
+        }
+
+        .dropdownList {
+            position: absolute;
+            z-index: 1;
+            top: 110%;
+            left: 0;
+            width: 100%;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            border-radius: 10px;   
+            flex-direction: column;
+            gap: 5px;
+            align-items: flex-start;
+            padding: 10px 0px 5px 0px;
+            max-height: 30vh;
+            overflow-y: scroll;
+            background: #fff;
+
+            &::-webkit-scrollbar {
+                width: 6px;
+            }
+            &::-webkit-scrollbar-thumb {
+                border-radius: 10px;
+                cursor: pointer;
+                background: #0e1527;
+
+                &:hover {
+                    background: #5a5d63;
+                }
+            }
+            &::-webkit-scrollbar-track {
+                margin: 15px 0px;
+            }
+
+            display: none;
+
+            &.show {
+                display: flex;
+            }
+
+            .item {
+                padding: 5px 15px;
+                width: 100%;
+                border-radius: 5px;
+                display: flex;
+                justify-content: flex-start;
+
+                &:hover {
+                    box-shadow: rgba(0, 0, 0, 0.24) 0px 0px 5px;
+                    cursor: pointer;
+                }
+
+                .itemTitle {
+                    font-size: 16px;
+                    color: #0a0c0f;
+                    text-align: start;
+                }
+            }
+        }
+    }
+
+    .fieldLabel {
+        font-size: 18px;
+        color: #292727;
+    }
+
+    .error {
+        color: #dd3a3a;
+        font-size: 14px;
+        min-height: 25px;
+    }
+}

@@ -21,7 +21,7 @@ export const FormField = ({
         type={type}
         placeholder={placeholder}
         {...register()}
-        onChange={onChange && onChange}
+        onChange={onChange}
         className={clsx(styles.input, inputClassName)}
         />
         <span className={clsx(styles.error, errorClassName)}>{error && error.message}</span>

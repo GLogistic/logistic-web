@@ -6,7 +6,6 @@ import { useSearchParams } from 'next/navigation';
 import clsx from 'clsx';
 import styles from './styles.module.scss';
 import { PrimaryButton } from '../buttons/primaryButton';
-import Link from 'next/link';
 import { PrimaryInput } from '../inputs/primaryInput';
 import { IPaginationParams } from '@/interfaces/params/pagination-params.interface';
 import { HeaderParams } from '@/enums/header-params.enum';
@@ -14,6 +13,9 @@ import { IRoute } from '@/interfaces/entity/route.interface';
 import { useDeleteRoute, useGetRoutes, useInvalidateGetRoutes } from '@/api/entities/route.api';
 import { useQueryClient } from '@tanstack/react-query';
 import { DeleteEntityModal } from '../modals/deleteEntityModal';
+import { ModalWithOverlay } from '../modals/modalWithOverlay';
+import { UpdateRouteForm } from '../forms/entities/update/route';
+import { CreateRouteForm } from '../forms/entities/create/route';
 
 export const Routes = () => {
     const [routes, setRoutes] = useState<IRoute[]>([]);
@@ -21,6 +23,8 @@ export const Routes = () => {
     const [startSettlementTitleFilter, setStartSettlementTitleFilter] = useState<string>('');
 
     const [isOpenDeleteModals, setIsOpenDeleteModals] = useState<boolean[]>([]);
+    const [isOpenUpdateModals, setIsOpenUpdateModals] = useState<boolean[]>([]);
+    const [isOpenCreateModal, setIsOpenCreateModal] = useState<boolean>(false);
 
     const setOpenDeleteModalByIndex = (index: number, value: boolean) => {
         const newIsOpenDeleteModals = [...isOpenDeleteModals];
@@ -28,6 +32,14 @@ export const Routes = () => {
         newIsOpenDeleteModals[index] = value;
 
         setIsOpenDeleteModals(newIsOpenDeleteModals);
+    }
+    
+    const setOpenUpdateModalByIndex = (index: number, value: boolean) => {
+        const newIsOpenUpdateModals = [...isOpenUpdateModals];
+
+        newIsOpenUpdateModals[index] = value;
+
+        setIsOpenUpdateModals(newIsOpenUpdateModals);
     }
 
     const searchParams = useSearchParams();
@@ -52,15 +64,15 @@ export const Routes = () => {
     
     const invalidateGetQuery = useInvalidateGetRoutes(queryClient);
 
-    const onSuccessDelete = async () => {
+    const onSuccessAction = async () => {
         await invalidateGetQuery();
-
-        const newIsOpenDeleteModals = Array(isOpenDeleteModals.length).fill(false);
-        setIsOpenDeleteModals(newIsOpenDeleteModals);
+        setIsOpenDeleteModals(Array(isOpenDeleteModals.length).fill(false));
+        setIsOpenUpdateModals(Array(isOpenDeleteModals.length).fill(false));
+        setIsOpenCreateModal(false);
     }
 
     const deleteRouteMutation = useDeleteRoute({
-        onSuccess: onSuccessDelete,
+        onSuccess: onSuccessAction,
     });
 
     useEffect(() => {
@@ -83,11 +95,18 @@ export const Routes = () => {
         setRoutes(data.data ?? [])
         
         setIsOpenDeleteModals(Array(data.data.length ?? 0).fill(false));
+        setIsOpenUpdateModals(Array(data.data.length ?? 0).fill(false));
     }, [data]); 
 
     return (
+        <>
         <div className={styles.mainContainer}>
             <div className={styles.tableHelper}>
+                    <PrimaryButton
+                    onClick={() => setIsOpenCreateModal(true)}
+                    >
+                        Create
+                    </PrimaryButton>
                     <PrimaryInput
                     className={styles.pageSizeInput}
                     type='number'
@@ -146,8 +165,10 @@ export const Routes = () => {
                                 >
                                     Delete
                                 </PrimaryButton>
-                                <PrimaryButton>
-                                    <Link href={'/'}>Update</Link>
+                                <PrimaryButton
+                                onClick={() => setOpenUpdateModalByIndex(idx, true)}
+                                >
+                                    Update
                                 </PrimaryButton>
 
                                 <DeleteEntityModal
@@ -158,6 +179,21 @@ export const Routes = () => {
                                     await deleteRouteMutation.mutateAsync({ id: route.id });
                                 }}
                                 />
+                                
+                                <ModalWithOverlay
+                                isOpen={isOpenUpdateModals[idx]}
+                                onClose={() => setOpenUpdateModalByIndex(idx, false)}
+                                >
+                                    <UpdateRouteForm
+                                    initialState={{
+                                        id: route.id,
+                                        startSettlementId: route.startSettlement.id,
+                                        endSettlementId: route.endSettlement.id,
+                                        distance: route.distance,
+                                    }}
+                                    onSucces={onSuccessAction}
+                                    />
+                                </ModalWithOverlay>
                             </td>
                         </tr>
                     ))}
@@ -180,5 +216,14 @@ export const Routes = () => {
                 </PrimaryButton>
             </div>
         </div>
+        <ModalWithOverlay
+        isOpen={isOpenCreateModal}
+        onClose={() => setIsOpenCreateModal(false)}
+        >
+            <CreateRouteForm
+            onSucces={onSuccessAction}
+            />
+        </ModalWithOverlay>
+        </>
     );
 };

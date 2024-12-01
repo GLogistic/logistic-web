@@ -7,11 +7,15 @@ import { CloseIcon } from '@/components/icons/CloseIcon';
 import { IModalWithOverlayParams } from '@/interfaces/params/modal-with-overlay-params.inteface';
 
 export const ModalWithOverlay = ({
+    isOpen,
     children,
     onClose,
     wrapperStyles = '',
     containerStyles = '',
 }: IModalWithOverlayParams) => {
+    if (!isOpen)
+        return;
+    
     const { isMobile } = useResizeWindow();
 
     const wrapperRef = useRef<HTMLDivElement | null>(null);

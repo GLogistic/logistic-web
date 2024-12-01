@@ -2,7 +2,7 @@ import { useFormContext } from "react-hook-form";
 import { FormField } from "../../field";
 
 import styles from './styles.module.scss';
-import { ISignUpData } from "@/interfaces/signUp-data.interface";
+import { IApiSignUpData } from "@/interfaces/api/api-signUp-data.interface";
 import { ChangeEvent } from "react";
 import { SubmitButton } from "@/components/buttons/submitButton";
 
@@ -12,7 +12,7 @@ export const SignUpFields = () => {
         formState,
         setValue,
         trigger,
-    } = useFormContext<ISignUpData>();
+    } = useFormContext<IApiSignUpData>();
 
     const changeField = (field: 'FirstName' | 'LastName' | 'UserName' | 'Email' | 'Password') => 
         (e: ChangeEvent<HTMLInputElement>) => {

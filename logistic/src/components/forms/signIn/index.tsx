@@ -1,13 +1,13 @@
 'use client'
 
 import { useSubmitSignIn } from "@/api/auth/submit-signIn.api";
-import { ISignInData } from "@/interfaces/signIn.interface";
+import { IApiSignInData } from "@/interfaces/api/api-signIn-data.interface";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { SignInFields } from "./fields";
 import * as yup from 'yup';
 import { yupResolver } from "@hookform/resolvers/yup";
 
-const schema: yup.ObjectSchema<ISignInData> = yup
+const schema: yup.ObjectSchema<IApiSignInData> = yup
     .object()
     .shape({
         Email: yup
@@ -26,7 +26,7 @@ export interface ISignInFormProps {
 export const SignInForm = ({
     onSucces,
 }: ISignInFormProps) => {
-    const form = useForm<ISignInData>({
+    const form = useForm<IApiSignInData>({
         resolver: yupResolver(schema),
     });
 
@@ -35,7 +35,7 @@ export const SignInForm = ({
     
     const signInMutation = useSubmitSignIn();
 
-    const onSubmit: SubmitHandler<ISignInData> = async (data) => {
+    const onSubmit: SubmitHandler<IApiSignInData> = async (data) => {
         const result = await signInMutation.mutateAsync(data);
 
         if (!result) {

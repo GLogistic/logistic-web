@@ -1,14 +1,11 @@
 'use client'
 
-import { useGetSettlements } from '@/api/entities/settlement.api';
-import { ISettlement } from '@/interfaces/entity/settlement.interface';
 import { useState, useEffect, ChangeEvent } from 'react';
 import { usePagination } from '../helpers/use-pagination.helper';
 import { useSearchParams } from 'next/navigation';
 import clsx from 'clsx';
 import styles from './styles.module.scss';
 import { PrimaryButton } from '../buttons/primaryButton';
-import Link from 'next/link';
 import { PrimaryInput } from '../inputs/primaryInput';
 import { IPaginationParams } from '@/interfaces/params/pagination-params.interface';
 import { HeaderParams } from '@/enums/header-params.enum';
@@ -16,11 +13,14 @@ import { useDeleteUser, useGetUsers, useInvalidateGetUsers } from '@/api/entitie
 import { IUser } from '@/interfaces/entity/user.interface';
 import { useQueryClient } from '@tanstack/react-query';
 import { DeleteEntityModal } from '../modals/deleteEntityModal';
+import { ModalWithOverlay } from '../modals/modalWithOverlay';
+import { UpdateUserForm } from '../forms/entities/update/user';
 
 export const Users = () => {
     const [users, setUsers] = useState<IUser[]>([]);
 
     const [isOpenDeleteModals, setIsOpenDeleteModals] = useState<boolean[]>([]);
+    const [isOpenUpdateModals, setIsOpenUpdateModals] = useState<boolean[]>([]);
 
     const setOpenDeleteModalByIndex = (index: number, value: boolean) => {
         const newIsOpenDeleteModals = [...isOpenDeleteModals];
@@ -28,6 +28,14 @@ export const Users = () => {
         newIsOpenDeleteModals[index] = value;
 
         setIsOpenDeleteModals(newIsOpenDeleteModals);
+    }
+
+    const setOpenUpdateModalByIndex = (index: number, value: boolean) => {
+        const newIsOpenUpdateModals = [...isOpenUpdateModals];
+
+        newIsOpenUpdateModals[index] = value;
+
+        setIsOpenUpdateModals(newIsOpenUpdateModals);
     }
 
     const searchParams = useSearchParams();
@@ -52,15 +60,14 @@ export const Users = () => {
 
     const invalidateGetQuery = useInvalidateGetUsers(queryClient);
 
-    const onSuccessDelete = async () => {
+    const onSuccessAction = async () => {
         await invalidateGetQuery();
-
-        const newIsOpenDeleteModals = Array(isOpenDeleteModals.length).fill(false);
-        setIsOpenDeleteModals(newIsOpenDeleteModals);
+        setIsOpenDeleteModals(Array(isOpenDeleteModals.length).fill(false));
+        setIsOpenUpdateModals(Array(isOpenDeleteModals.length).fill(false));
     }
 
     const deleteCargoMutation = useDeleteUser({
-        onSuccess: onSuccessDelete,
+        onSuccess: onSuccessAction,
     });
 
     useEffect(() => {
@@ -83,6 +90,7 @@ export const Users = () => {
         setUsers(data.data ?? [])
         
         setIsOpenDeleteModals(Array(data.data.length ?? 0).fill(false));
+        setIsOpenUpdateModals(Array(data.data.length ?? 0).fill(false));
     }, [data]); 
 
     return (
@@ -105,7 +113,13 @@ export const Users = () => {
                 <thead>
                     <tr>
                         <th className={clsx(styles.cell, styles.headerCell)}>
-                            Name
+                            First name
+                        </th>
+                        <th className={clsx(styles.cell, styles.headerCell)}>
+                            Last name
+                        </th>
+                        <th className={clsx(styles.cell, styles.headerCell)}>
+                            User name
                         </th>
                         <th className={clsx(styles.cell, styles.headerCell)}>
                             Email
@@ -118,7 +132,9 @@ export const Users = () => {
                 <tbody>
                     {users && users.map((user, idx) => (
                         <tr key={`user-${idx}`}>
-                            <td className={styles.cell}>{`${user.firstName} ${user.lastName}`}</td>
+                            <td className={styles.cell}>{`${user.firstName}`}</td>
+                            <td className={styles.cell}>{`${user.lastName}`}</td>
+                            <td className={styles.cell}>{`${user.userName}`}</td>
                             <td className={styles.cell}>{user.email}</td>
                             <td className={clsx(styles.cell, styles.actionButtonsCell)}>
                                 <PrimaryButton
@@ -126,8 +142,10 @@ export const Users = () => {
                                 >
                                     Delete
                                 </PrimaryButton>
-                                <PrimaryButton>
-                                    <Link href={'/'}>Update</Link>
+                                <PrimaryButton
+                                onClick={() => setOpenUpdateModalByIndex(idx, true)}
+                                >
+                                    Update
                                 </PrimaryButton>
                                 
                                 <DeleteEntityModal
@@ -138,6 +156,16 @@ export const Users = () => {
                                     await deleteCargoMutation.mutateAsync({ id: user.id });
                                 }}
                                 />
+                                
+                                <ModalWithOverlay
+                                isOpen={isOpenUpdateModals[idx]}
+                                onClose={() => setOpenUpdateModalByIndex(idx, false)}
+                                >
+                                    <UpdateUserForm
+                                    initialState={user}
+                                    onSucces={onSuccessAction}
+                                    />
+                                </ModalWithOverlay>
                             </td>
                         </tr>
                     ))}

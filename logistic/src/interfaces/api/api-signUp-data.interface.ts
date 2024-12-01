@@ -1,4 +1,4 @@
-export interface ISignUpData {
+export interface IApiSignUpData {
     FirstName: string;
     LastName: string;
     UserName: string;

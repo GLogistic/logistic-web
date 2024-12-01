@@ -6,7 +6,6 @@ import { useSearchParams } from 'next/navigation';
 import clsx from 'clsx';
 import styles from './styles.module.scss';
 import { PrimaryButton } from '../buttons/primaryButton';
-import Link from 'next/link';
 import { PrimaryInput } from '../inputs/primaryInput';
 import { IPaginationParams } from '@/interfaces/params/pagination-params.interface';
 import { HeaderParams } from '@/enums/header-params.enum';
@@ -14,6 +13,9 @@ import { ICargo } from '@/interfaces/entity/cargo.interface';
 import { useDeleteCargo, useGetCargos, useInvalidateGetCargos } from '@/api/entities/cargo.api';
 import { DeleteEntityModal } from '../modals/deleteEntityModal';
 import { useQueryClient } from '@tanstack/react-query';
+import { ModalWithOverlay } from '../modals/modalWithOverlay';
+import { UpdateCargoForm } from '../forms/entities/update/cargo';
+import { CreateCargoForm } from '../forms/entities/create/cargo';
 
 export const Cargos = () => {
     const [cargos, setCargos] = useState<ICargo[]>([]);
@@ -21,6 +23,8 @@ export const Cargos = () => {
     const [titleFilter, setTitleFilter] = useState<string>('');
     
     const [isOpenDeleteModals, setIsOpenDeleteModals] = useState<boolean[]>([]);
+    const [isOpenUpdateModals, setIsOpenUpdateModals] = useState<boolean[]>([]);
+    const [isOpenCreateModal, setIsOpenCreateModal] = useState<boolean>(false);
 
     const setOpenDeleteModalByIndex = (index: number, value: boolean) => {
         const newIsOpenDeleteModals = [...isOpenDeleteModals];
@@ -28,6 +32,14 @@ export const Cargos = () => {
         newIsOpenDeleteModals[index] = value;
 
         setIsOpenDeleteModals(newIsOpenDeleteModals);
+    }
+
+    const setOpenUpdateModalByIndex = (index: number, value: boolean) => {
+        const newIsOpenUpdateModals = [...isOpenUpdateModals];
+
+        newIsOpenUpdateModals[index] = value;
+
+        setIsOpenUpdateModals(newIsOpenUpdateModals);
     }
 
     const searchParams = useSearchParams();
@@ -52,15 +64,15 @@ export const Cargos = () => {
 
     const invalidateGetQuery = useInvalidateGetCargos(queryClient);
 
-    const onSuccessDelete = async () => {
+    const onSuccessAction = async () => {
         await invalidateGetQuery();
-
-        const newIsOpenDeleteModals = Array(isOpenDeleteModals.length).fill(false);
-        setIsOpenDeleteModals(newIsOpenDeleteModals);
+        setIsOpenDeleteModals(Array(isOpenDeleteModals.length).fill(false));
+        setIsOpenUpdateModals(Array(isOpenDeleteModals.length).fill(false));
+        setIsOpenCreateModal(false);
     }
 
     const deleteCargoMutation = useDeleteCargo({
-        onSuccess: onSuccessDelete,
+        onSuccess: onSuccessAction,
     });
 
     useEffect(() => {
@@ -82,12 +94,18 @@ export const Cargos = () => {
         setCargos(data.data ?? [])
 
         setIsOpenDeleteModals(Array(data.data.length ?? 0).fill(false));
+        setIsOpenUpdateModals(Array(data.data.length ?? 0).fill(false));
     }, [data]); 
 
     return (
         <>
         <div className={styles.mainContainer}>
             <div className={styles.tableHelper}>
+                    <PrimaryButton
+                    onClick={() => setIsOpenCreateModal(true)}
+                    >
+                        Create
+                    </PrimaryButton>
                     <PrimaryInput
                     className={styles.pageSizeInput}
                     type='number'
@@ -145,8 +163,10 @@ export const Cargos = () => {
                                 >
                                     Delete
                                 </PrimaryButton>
-                                <PrimaryButton>
-                                    <Link href={'/'}>Update</Link>
+                                <PrimaryButton
+                                onClick={() => setOpenUpdateModalByIndex(idx, true)}
+                                >
+                                    Update
                                 </PrimaryButton>
 
                                 <DeleteEntityModal
@@ -157,6 +177,16 @@ export const Cargos = () => {
                                     await deleteCargoMutation.mutateAsync({ id: cargo.id });
                                 }}
                                 />
+
+                                <ModalWithOverlay
+                                isOpen={isOpenUpdateModals[idx]}
+                                onClose={() => setOpenUpdateModalByIndex(idx, false)}
+                                >
+                                    <UpdateCargoForm
+                                    initialState={cargo}
+                                    onSucces={onSuccessAction}
+                                    />
+                                </ModalWithOverlay>
                             </td>
                         </tr>
                     ))}
@@ -178,7 +208,15 @@ export const Cargos = () => {
                     Next
                 </PrimaryButton>
             </div>
-        </div> 
+        </div>
+        <ModalWithOverlay
+        isOpen={isOpenCreateModal}
+        onClose={() => setIsOpenCreateModal(false)}
+        >
+            <CreateCargoForm
+            onSucces={onSuccessAction}
+            />
+        </ModalWithOverlay>
         </>
     );
 };
