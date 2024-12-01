@@ -1,6 +1,6 @@
 'use client'
 
-import { useGetSettlements } from '@/api/get-settlements.api';
+import { useGetSettlements } from '@/api/entities/settlement.api';
 import { ISettlement } from '@/interfaces/entity/settlement.interface';
 import { useState, useEffect, ChangeEvent } from 'react';
 import { usePagination } from '../helpers/use-pagination.helper';
@@ -10,13 +10,25 @@ import styles from './styles.module.scss';
 import { PrimaryButton } from '../buttons/primaryButton';
 import Link from 'next/link';
 import { PrimaryInput } from '../inputs/primaryInput';
-import { IPaginationParams } from '@/interfaces/pagination-params.interface';
+import { IPaginationParams } from '@/interfaces/params/pagination-params.interface';
 import { HeaderParams } from '@/enums/header-params.enum';
-import { useGetUsers } from '@/api/get-users.api';
+import { useDeleteUser, useGetUsers, useInvalidateGetUsers } from '@/api/entities/user.api';
 import { IUser } from '@/interfaces/entity/user.interface';
+import { useQueryClient } from '@tanstack/react-query';
+import { DeleteEntityModal } from '../modals/deleteEntityModal';
 
 export const Users = () => {
     const [users, setUsers] = useState<IUser[]>([]);
+
+    const [isOpenDeleteModals, setIsOpenDeleteModals] = useState<boolean[]>([]);
+
+    const setOpenDeleteModalByIndex = (index: number, value: boolean) => {
+        const newIsOpenDeleteModals = [...isOpenDeleteModals];
+
+        newIsOpenDeleteModals[index] = value;
+
+        setIsOpenDeleteModals(newIsOpenDeleteModals);
+    }
 
     const searchParams = useSearchParams();
     
@@ -34,7 +46,22 @@ export const Users = () => {
         Number(searchParams.get('pageSize'))
     );
     
+    const queryClient = useQueryClient();
+    
     const { data } = useGetUsers({page, pageSize});
+
+    const invalidateGetQuery = useInvalidateGetUsers(queryClient);
+
+    const onSuccessDelete = async () => {
+        await invalidateGetQuery();
+
+        const newIsOpenDeleteModals = Array(isOpenDeleteModals.length).fill(false);
+        setIsOpenDeleteModals(newIsOpenDeleteModals);
+    }
+
+    const deleteCargoMutation = useDeleteUser({
+        onSuccess: onSuccessDelete,
+    });
 
     useEffect(() => {
         if (!data || !data!.headers)
@@ -54,6 +81,8 @@ export const Users = () => {
         setTotalPages(paginationParams.totalPages);
 
         setUsers(data.data ?? [])
+        
+        setIsOpenDeleteModals(Array(data.data.length ?? 0).fill(false));
     }, [data]); 
 
     return (
@@ -92,12 +121,23 @@ export const Users = () => {
                             <td className={styles.cell}>{`${user.firstName} ${user.lastName}`}</td>
                             <td className={styles.cell}>{user.email}</td>
                             <td className={clsx(styles.cell, styles.actionButtonsCell)}>
-                                <PrimaryButton>
+                                <PrimaryButton
+                                onClick={() => setOpenDeleteModalByIndex(idx, true)}
+                                >
                                     Delete
                                 </PrimaryButton>
                                 <PrimaryButton>
                                     <Link href={'/'}>Update</Link>
                                 </PrimaryButton>
+                                
+                                <DeleteEntityModal
+                                isOpen={isOpenDeleteModals[idx]}
+                                entityTitle={user.userName}
+                                onClose={() => setOpenDeleteModalByIndex(idx, false)}
+                                onDelete={async () => {
+                                    await deleteCargoMutation.mutateAsync({ id: user.id });
+                                }}
+                                />
                             </td>
                         </tr>
                     ))}

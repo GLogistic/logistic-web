@@ -8,15 +8,27 @@ import styles from './styles.module.scss';
 import { PrimaryButton } from '../buttons/primaryButton';
 import Link from 'next/link';
 import { PrimaryInput } from '../inputs/primaryInput';
-import { IPaginationParams } from '@/interfaces/pagination-params.interface';
+import { IPaginationParams } from '@/interfaces/params/pagination-params.interface';
 import { HeaderParams } from '@/enums/header-params.enum';
 import { IRoute } from '@/interfaces/entity/route.interface';
-import { useGetRoutes } from '@/api/get-routes.api';
+import { useDeleteRoute, useGetRoutes, useInvalidateGetRoutes } from '@/api/entities/route.api';
+import { useQueryClient } from '@tanstack/react-query';
+import { DeleteEntityModal } from '../modals/deleteEntityModal';
 
 export const Routes = () => {
     const [routes, setRoutes] = useState<IRoute[]>([]);
 
     const [startSettlementTitleFilter, setStartSettlementTitleFilter] = useState<string>('');
+
+    const [isOpenDeleteModals, setIsOpenDeleteModals] = useState<boolean[]>([]);
+
+    const setOpenDeleteModalByIndex = (index: number, value: boolean) => {
+        const newIsOpenDeleteModals = [...isOpenDeleteModals];
+
+        newIsOpenDeleteModals[index] = value;
+
+        setIsOpenDeleteModals(newIsOpenDeleteModals);
+    }
 
     const searchParams = useSearchParams();
     
@@ -34,7 +46,22 @@ export const Routes = () => {
         Number(searchParams.get('pageSize'))
     );
     
+    const queryClient = useQueryClient();
+    
     const { data } = useGetRoutes({page, pageSize, startSettlementTitleFilter});
+    
+    const invalidateGetQuery = useInvalidateGetRoutes(queryClient);
+
+    const onSuccessDelete = async () => {
+        await invalidateGetQuery();
+
+        const newIsOpenDeleteModals = Array(isOpenDeleteModals.length).fill(false);
+        setIsOpenDeleteModals(newIsOpenDeleteModals);
+    }
+
+    const deleteRouteMutation = useDeleteRoute({
+        onSuccess: onSuccessDelete,
+    });
 
     useEffect(() => {
         if (!data || !data!.headers)
@@ -54,6 +81,8 @@ export const Routes = () => {
         setTotalPages(paginationParams.totalPages);
 
         setRoutes(data.data ?? [])
+        
+        setIsOpenDeleteModals(Array(data.data.length ?? 0).fill(false));
     }, [data]); 
 
     return (
@@ -112,12 +141,23 @@ export const Routes = () => {
                             <td className={styles.cell}>{route.endSettlement.title}</td>
                             <td className={styles.cell}>{route.distance}</td>
                             <td className={clsx(styles.cell, styles.actionButtonsCell)}>
-                                <PrimaryButton>
+                                <PrimaryButton
+                                onClick={() => setOpenDeleteModalByIndex(idx, true)}
+                                >
                                     Delete
                                 </PrimaryButton>
                                 <PrimaryButton>
                                     <Link href={'/'}>Update</Link>
                                 </PrimaryButton>
+
+                                <DeleteEntityModal
+                                isOpen={isOpenDeleteModals[idx]}
+                                entityTitle={`${route.startSettlement.title} -> ${route.endSettlement.title} ${route.distance}km`}
+                                onClose={() => setOpenDeleteModalByIndex(idx, false)}
+                                onDelete={async () => {
+                                    await deleteRouteMutation.mutateAsync({ id: route.id });
+                                }}
+                                />
                             </td>
                         </tr>
                     ))}

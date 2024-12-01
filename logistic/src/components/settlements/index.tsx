@@ -1,6 +1,6 @@
 'use client'
 
-import { useGetSettlements } from '@/api/get-settlements.api';
+import { useDeleteSettlement, useGetSettlements, useInvalidateGetSettlements } from '@/api/entities/settlement.api';
 import { ISettlement } from '@/interfaces/entity/settlement.interface';
 import { useState, useEffect, ChangeEvent } from 'react';
 import { usePagination } from '../helpers/use-pagination.helper';
@@ -10,13 +10,25 @@ import styles from './styles.module.scss';
 import { PrimaryButton } from '../buttons/primaryButton';
 import Link from 'next/link';
 import { PrimaryInput } from '../inputs/primaryInput';
-import { IPaginationParams } from '@/interfaces/pagination-params.interface';
+import { IPaginationParams } from '@/interfaces/params/pagination-params.interface';
 import { HeaderParams } from '@/enums/header-params.enum';
+import { useQueryClient } from '@tanstack/react-query';
+import { DeleteEntityModal } from '../modals/deleteEntityModal';
 
 export const Settlements = () => {
     const [settlements, setSettlements] = useState<ISettlement[]>([]);
 
     const [titleFilter, setTitleFilter] = useState<string>('');
+
+    const [isOpenDeleteModals, setIsOpenDeleteModals] = useState<boolean[]>([]);
+
+    const setOpenDeleteModalByIndex = (index: number, value: boolean) => {
+        const newIsOpenDeleteModals = [...isOpenDeleteModals];
+
+        newIsOpenDeleteModals[index] = value;
+
+        setIsOpenDeleteModals(newIsOpenDeleteModals);
+    }
 
     const searchParams = useSearchParams();
     
@@ -34,7 +46,22 @@ export const Settlements = () => {
         Number(searchParams.get('pageSize'))
     );
     
+    const queryClient = useQueryClient();
+    
     const { data } = useGetSettlements({page, pageSize, titleFilter});
+
+    const invalidateGetQuery = useInvalidateGetSettlements(queryClient);
+
+    const onSuccessDelete = async () => {
+        await invalidateGetQuery();
+
+        const newIsOpenDeleteModals = Array(isOpenDeleteModals.length).fill(false);
+        setIsOpenDeleteModals(newIsOpenDeleteModals);
+    }
+
+    const deleteCargoMutation = useDeleteSettlement({
+        onSuccess: onSuccessDelete,
+    });
 
     useEffect(() => {
         if (!data || !data!.headers)
@@ -54,6 +81,8 @@ export const Settlements = () => {
         setTotalPages(paginationParams.totalPages);
 
         setSettlements(data.data ?? [])
+        
+        setIsOpenDeleteModals(Array(data.data.length ?? 0).fill(false));
     }, [data]); 
 
     return (
@@ -103,12 +132,23 @@ export const Settlements = () => {
                         <tr key={`settlement-${idx}`}>
                             <td className={styles.cell}>{settlement.title}</td>
                             <td className={clsx(styles.cell, styles.actionButtonsCell)}>
-                                <PrimaryButton>
+                                <PrimaryButton
+                                onClick={() => setOpenDeleteModalByIndex(idx, true)}
+                                >
                                     Delete
                                 </PrimaryButton>
                                 <PrimaryButton>
                                     <Link href={'/'}>Update</Link>
                                 </PrimaryButton>
+
+                                <DeleteEntityModal
+                                isOpen={isOpenDeleteModals[idx]}
+                                entityTitle={settlement.title}
+                                onClose={() => setOpenDeleteModalByIndex(idx, false)}
+                                onDelete={async () => {
+                                    await deleteCargoMutation.mutateAsync({ id: settlement.id });
+                                }}
+                                />
                             </td>
                         </tr>
                     ))}

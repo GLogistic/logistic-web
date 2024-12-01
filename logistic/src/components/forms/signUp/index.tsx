@@ -3,7 +3,7 @@ import { SignUpFields } from "./fields";
 import * as yup from 'yup';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ISignUpData } from "@/interfaces/signUp-data.interface";
-import { useSubmitSignUp } from "@/api/submit-signUp.api";
+import { useSubmitSignUp } from "@/api/auth/submit-signUp.api";
 
 const schema: yup.ObjectSchema<ISignUpData> = yup
     .object()

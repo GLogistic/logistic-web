@@ -1,6 +1,6 @@
 'use client'
 
-import { useSubmitSignIn } from "@/api/submit-signIn.api";
+import { useSubmitSignIn } from "@/api/auth/submit-signIn.api";
 import { ISignInData } from "@/interfaces/signIn.interface";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { SignInFields } from "./fields";

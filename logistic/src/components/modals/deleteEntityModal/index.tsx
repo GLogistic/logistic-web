@@ -4,14 +4,17 @@ import { useResizeWindow } from '@/helpers/useResizeWindow';
 
 import styles from './styles.module.scss';
 import { CloseIcon } from '@/components/icons/CloseIcon';
-import { IModalWithOverlayParams } from '@/interfaces/params/modal-with-overlay-params.inteface';
+import { IDeleteEntityModalParams } from '@/interfaces/params/delete-entity-modal-params.interface';
 
-export const ModalWithOverlay = ({
-    children,
+export const DeleteEntityModal = ({
+    isOpen,
+    entityTitle,
     onClose,
+    onDelete,
+    error = '',
     wrapperStyles = '',
     containerStyles = '',
-}: IModalWithOverlayParams) => {
+}: IDeleteEntityModalParams) => {
     const { isMobile } = useResizeWindow();
 
     const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -31,6 +34,9 @@ export const ModalWithOverlay = ({
         }
     }, [onClose]);
 
+    if (!isOpen)
+        return;
+
     return (
         <div className={styles.overlay}>
             <div 
@@ -48,7 +54,29 @@ export const ModalWithOverlay = ({
                             />
                         </button>
                     </div>
-                    {children}
+                    <div className={styles.modalContent}>
+                        <p className={styles.approveText}>
+                            Are you sure delete
+                            <span className={styles.entityTitle}> {entityTitle}</span>?
+                        </p>
+                        <div className={styles.buttonsContainer}>
+                            <button 
+                            className={clsx(styles.button, styles.approve)}
+                            onClick={onDelete}
+                            >
+                                Confirm
+                            </button>
+                            <button 
+                            className={clsx(styles.button, styles.reject)}
+                            onClick={onClose}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                    <div className={styles.errorContainer}>
+                            <p className={styles.error}>{error}</p>
+                    </div>
                 </div>
             </div>
         </div>

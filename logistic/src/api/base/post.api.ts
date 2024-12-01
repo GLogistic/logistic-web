@@ -1,4 +1,3 @@
-import { IApiGetParams } from "@/interfaces/api/api-get-params.interface";
 import { LogisticHostApi } from "./logisticHost.api";
 import { validateApiError } from "./helper/validate-api-error.helper";
 import { IApiPostParams } from "@/interfaces/api/api-post-params.interface";

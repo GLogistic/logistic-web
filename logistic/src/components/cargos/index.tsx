@@ -1,7 +1,5 @@
 'use client'
 
-import { useGetSettlements } from '@/api/get-settlements.api';
-import { ISettlement } from '@/interfaces/entity/settlement.interface';
 import { useState, useEffect, ChangeEvent } from 'react';
 import { usePagination } from '../helpers/use-pagination.helper';
 import { useSearchParams } from 'next/navigation';
@@ -10,15 +8,27 @@ import styles from './styles.module.scss';
 import { PrimaryButton } from '../buttons/primaryButton';
 import Link from 'next/link';
 import { PrimaryInput } from '../inputs/primaryInput';
-import { IPaginationParams } from '@/interfaces/pagination-params.interface';
+import { IPaginationParams } from '@/interfaces/params/pagination-params.interface';
 import { HeaderParams } from '@/enums/header-params.enum';
 import { ICargo } from '@/interfaces/entity/cargo.interface';
-import { useGetCargos } from '@/api/get-cargos.api';
+import { useDeleteCargo, useGetCargos, useInvalidateGetCargos } from '@/api/entities/cargo.api';
+import { DeleteEntityModal } from '../modals/deleteEntityModal';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const Cargos = () => {
     const [cargos, setCargos] = useState<ICargo[]>([]);
 
     const [titleFilter, setTitleFilter] = useState<string>('');
+    
+    const [isOpenDeleteModals, setIsOpenDeleteModals] = useState<boolean[]>([]);
+
+    const setOpenDeleteModalByIndex = (index: number, value: boolean) => {
+        const newIsOpenDeleteModals = [...isOpenDeleteModals];
+
+        newIsOpenDeleteModals[index] = value;
+
+        setIsOpenDeleteModals(newIsOpenDeleteModals);
+    }
 
     const searchParams = useSearchParams();
     
@@ -35,8 +45,23 @@ export const Cargos = () => {
         Number(searchParams.get('page')),
         Number(searchParams.get('pageSize'))
     );
+
+    const queryClient = useQueryClient();
     
     const { data } = useGetCargos({page, pageSize, titleFilter});
+
+    const invalidateGetQuery = useInvalidateGetCargos(queryClient);
+
+    const onSuccessDelete = async () => {
+        await invalidateGetQuery();
+
+        const newIsOpenDeleteModals = Array(isOpenDeleteModals.length).fill(false);
+        setIsOpenDeleteModals(newIsOpenDeleteModals);
+    }
+
+    const deleteCargoMutation = useDeleteCargo({
+        onSuccess: onSuccessDelete,
+    });
 
     useEffect(() => {
         if (!data || !data!.headers)
@@ -46,7 +71,6 @@ export const Cargos = () => {
             setCargos([]);
             return;
         }
-
         const paginationParamsString = data!.headers[HeaderParams.Pagination] ?? '{}';
         const paginationParams = JSON.parse(paginationParamsString) as IPaginationParams;
 
@@ -56,9 +80,12 @@ export const Cargos = () => {
         setTotalPages(paginationParams.totalPages);
 
         setCargos(data.data ?? [])
+
+        setIsOpenDeleteModals(Array(data.data.length ?? 0).fill(false));
     }, [data]); 
 
     return (
+        <>
         <div className={styles.mainContainer}>
             <div className={styles.tableHelper}>
                     <PrimaryInput
@@ -113,12 +140,23 @@ export const Cargos = () => {
                             <td className={styles.cell}>{cargo.weight}</td>
                             <td className={styles.cell}>{cargo.registrationNumber}</td>
                             <td className={clsx(styles.cell, styles.actionButtonsCell)}>
-                                <PrimaryButton>
+                                <PrimaryButton
+                                onClick={() => setOpenDeleteModalByIndex(idx, true)}
+                                >
                                     Delete
                                 </PrimaryButton>
                                 <PrimaryButton>
                                     <Link href={'/'}>Update</Link>
                                 </PrimaryButton>
+
+                                <DeleteEntityModal
+                                isOpen={isOpenDeleteModals[idx]}
+                                entityTitle={cargo.title}
+                                onClose={() => setOpenDeleteModalByIndex(idx, false)}
+                                onDelete={async () => {
+                                    await deleteCargoMutation.mutateAsync({ id: cargo.id });
+                                }}
+                                />
                             </td>
                         </tr>
                     ))}
@@ -140,6 +178,7 @@ export const Cargos = () => {
                     Next
                 </PrimaryButton>
             </div>
-        </div>
+        </div> 
+        </>
     );
 };
