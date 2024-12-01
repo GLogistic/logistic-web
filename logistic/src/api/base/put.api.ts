@@ -14,6 +14,7 @@ export const logisticHostApiPut = async <TResponse = any>({
 )
 .then(data => data)
 .catch(error => {
-    isValidateResponse && validateApiError(error);
+    if(isValidateResponse)
+        validateApiError(error);
     return error;
 });

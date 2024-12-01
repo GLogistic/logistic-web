@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/header";
 import { Providers } from "@/components/providers";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Glogistic",
@@ -15,14 +16,16 @@ export default function RootLayout({
 }>) {
   return (
     <Providers>
-    <html lang="en">
-      <body>
-        <header>
-          <Header/>
-        </header>
-        {children}
-      </body>
-    </html>
+      <Suspense>
+        <html lang="en">
+          <body>
+            <header>
+              <Header/>
+            </header>
+            {children}
+          </body>
+        </html>
+      </Suspense>
     </Providers>
   );
 }

@@ -1,4 +1,4 @@
-import { DOMAttributes, HTMLAttributes, InputHTMLAttributes } from 'react';
+import { InputHTMLAttributes } from 'react';
 import styles from './styles.module.scss';
 import clsx from 'clsx';
 

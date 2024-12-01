@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 
-export const usePagination = (initPage?: number, initPageSize?: number, initTotalSize?: number) => {
+export const usePagination = (initPage?: number, initPageSize?: number) => {
     const [page, setPage] = useState<number>(initPage ?? 1);
     const [pageSize, setPageSize] = useState<number>(initPageSize ?? 1);
     const [totalSize, setTotalSize] = useState<number>(initPageSize ?? 1);

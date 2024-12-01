@@ -4,7 +4,6 @@ import styles from './styles.module.scss';
 import { ChangeEvent } from "react";
 import { SubmitButton } from "@/components/buttons/submitButton";
 import { FormField } from "@/components/forms/field";
-import { IApiUpdateCargo } from "@/interfaces/api/api-update-cargo.interface";
 import { IApiCreateCargo } from "@/interfaces/api/api-create-cargo.interface";
 
 export const CreateCargoFields = () => {
