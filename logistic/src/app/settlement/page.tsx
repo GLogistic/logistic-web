@@ -1,7 +1,10 @@
 import { Settlements } from "@/components/settlements";
+import { Suspense } from "react";
 
 const Page = () => (
-    <Settlements/>
+    <Suspense>
+        <Settlements/>
+    </Suspense>
 );
 
 export default Page;

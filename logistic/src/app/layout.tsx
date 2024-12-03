@@ -16,7 +16,6 @@ export default function RootLayout({
 }>) {
   return (
     <Providers>
-      <Suspense>
         <html lang="en">
           <body>
             <header>
@@ -25,7 +24,6 @@ export default function RootLayout({
             {children}
           </body>
         </html>
-      </Suspense>
     </Providers>
   );
 }

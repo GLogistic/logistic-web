@@ -1,7 +1,10 @@
 import { Routes } from "@/components/routes";
+import { Suspense } from "react";
 
 const Page = () => (
-    <Routes/>
+    <Suspense>
+        <Routes/>
+    </Suspense>
 );
 
 export default Page;
